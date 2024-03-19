@@ -1663,23 +1663,29 @@ export function compiler(
     [RuleType.refImage]: {
       match: simpleInlineRegex(REFERENCE_IMAGE_R),
       order: Priority.MAX,
-      parse(capture) {
+      parse(capture, parse, state) {
         return {
           alt: capture[1] || undefined,
+          fallbackChildren: parse(
+              capture[0].replace(SQUARE_BRACKETS_R, '\\$1'),
+              state
+          ),
           ref: capture[2],
         }
       },
       render(node, output, state) {
-        return (
+        return refs[node.ref] ? (
           <img
             key={state.key}
             alt={node.alt}
             src={sanitizeUrl(refs[node.ref].target)}
             title={refs[node.ref].title}
           />
+        ) : (
+            <span key={state.key}>{ output(node.fallbackChildren, state) }</span>
         )
       },
-    } as MarkdownToJSX.Rule<{ alt?: string; ref: string }>,
+    },
 
     [RuleType.refLink]: {
       match: inlineRegex(REFERENCE_LINK_R),
@@ -2081,6 +2087,7 @@ export namespace MarkdownToJSX {
   export interface ReferenceImageNode {
     type: RuleType.refImage
     alt?: string
+    fallbackChildren: MarkdownToJSX.ParserResult[]
     ref: string
   }
 
