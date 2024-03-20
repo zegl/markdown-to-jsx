@@ -1,3 +1,9 @@
+> [!NOTE]
+> 
+> This is a fork of markdown-to-jsx, that contains extra features that have not yet been merged upstream.
+>
+> It's used in production.
+
 **markdown-to-jsx**
 
 The most lightweight, customizable React markdown component.
